@@ -1,0 +1,35 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+::-webkit-input-placeholder {color:#fff;}
+::-moz-placeholder          {color:#fff;}/* Firefox 19+ /
+:-moz-placeholder           {color:#c0392b;}/ Firefox 18- */
+:-ms-input-placeholder      {color:#fff;}
+
+.field-api{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+input{
+    background: #0a94a7;
+    width: 300px;
+    height: 60px;
+    color: aliceblue;
+    border: none;
+    outline: none;
+    margin: 10px;
+    padding: 5px 10px;
+}
+button{
+    cursor: pointer;
+    width: 300px;
+    height: 60px;
+    border: none;
+    outline: none;
+    margin: 10px;
+    padding: 5px 10px;
+}
