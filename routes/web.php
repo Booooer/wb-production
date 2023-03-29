@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('api', 'App\Http\Controllers\ApiController@getData')
-    ->name('api');
-Route::post('parse', 'App\Http\Controllers\ApiController@parseData')
-    ->name('parse');    
+Route::post('update/storage', 'App\Http\Controllers\ApiController@updateStorage')
+    ->name('update.storage');
+Route::post('update/realizations', 'App\Http\Controllers\ApiController@updateRealizations')
+    ->name('update.realizations');    

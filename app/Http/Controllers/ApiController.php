@@ -8,34 +8,55 @@ use App\Models\Realization;
 
 class ApiController extends Controller
 {
-    // public function getData(Request $request){
-    //     $json = json_decode(file_get_contents("php://input"));
+    private function getContext($api){
+        $options = [
+            'http' => [
+                'method' => 'GET',
+                'header' => [
+                    'accept: application/json',
+                    'content-type: application/json',
+                    "Authorization: $api"
+                ]
+            ]
+        ];
 
-    //     // foreach($json as $item){
-    //     //     Storage::create([
-    //     //         'nmId' => $item->nmId
-    //     //         'lastChangeDate' => $item->lastChangeDate
-    //     //         'supplierArticle' => $item->supplierArticle
-    //     //         'techSize' => $item->techSize
-    //     //         'barcode' => $item->barcode
-    //     //         'quantity' => $item->quantity
-    //     //         'isSupply' => $item->isSupply
-    //     //         'isRealization' => $item->isRealization
-    //     //         'quantityFull' => $item->quantityFull
-    //     //         'warehouseName' => $item->warehouseName
-    //     //         'subject' => $item->subject
-    //     //         'category' => $item->category
-    //     //         'daysOnSite' => $item->daysOnSite
-    //     //         'brand' => $item->brand
-    //     //         'SCCode' => $item->SCCode
-    //     //         'Price' => $item->Price
-    //     //         'Discount' => $item->Discount
-    //     //     ]);
-    //     // }
-    //     return $json;
-    // }
+        return stream_context_create($options);
+    }
 
-    public function parseData(Request $request){
+    public function updateStorage(Request $request){
+        $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
+        $dateFrom = $request->dateFrom;
+        $url = "https://statistics-api.wildberries.ru/api/v1/supplier/stocks?dateFrom=$dateFrom";
+
+        $context = $this->getContext($api);
+
+        $result = json_decode(file_get_contents($url, false, $context));
+
+        foreach($result as $item){
+            Storage::create([
+                'nmId' => $item->nmId,
+                'lastChangeDate' => $item->lastChangeDate,
+                'supplierArticle' => $item->supplierArticle,
+                'techSize' => $item->techSize,
+                'barcode' => $item->barcode,
+                'quantity' => $item->quantity,
+                'isSupply' => $item->isSupply,
+                'isRealization' => $item->isRealization,
+                'quantityFull' => $item->quantityFull,
+                'warehouseName' => $item->warehouseName,
+                'subject' => $item->subject,
+                'category' => $item->category,
+                'daysOnSite' => $item->daysOnSite,
+                'brand' => $item->brand,
+                'SCCode' => $item->SCCode,
+                'Price' => $item->Price,
+                'Discount' => $item->Discount,
+            ]);
+        }
+        
+    }
+
+    public function updateRealizations(Request $request){
         $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
@@ -63,13 +84,15 @@ class ApiController extends Controller
         $context = stream_context_create($options);
 
         $result = json_decode(file_get_contents($url, false, $context));
+
+        // dd($result);
         
         foreach($result as $item){
             Realization::create([
                 "realizationreport_id" => $item->realizationreport_id,
-                "date_from"	=> $item->date_from,
-                "date_to" => $item->date_to,
-                "create_dt" => $item->create_dt,
+                "date_from"	=> date('Y-m-d H:i:s', strtotime($item->date_from)),
+                "date_to" => date('Y-m-d H:i:s', strtotime($item->date_to)),
+                "create_dt" => date('Y-m-d H:i:s', strtotime($item->create_dt)),
                 "suppliercontract_code" => $item->suppliercontract_code,
                 "rrd_id" => $item->rrd_id,	
                 "gi_id" => $item->gi_id,	
@@ -87,9 +110,9 @@ class ApiController extends Controller
                 "commission_percent" => $item->commission_percent,
                 "office_name" => $item->office_name,
                 "supplier_oper_name" => $item->supplier_oper_name,
-                "order_dt"	 => $item->order_dt,
-                "sale_dt" => $item->sale_dt,
-                "rr_dt"	 => $item->rr_dt,
+                "order_dt"	 => date('Y-m-d H:i:s', strtotime($item->order_dt)),
+                "sale_dt" => date('Y-m-d H:i:s', strtotime($item->sale_dt)),
+                "rr_dt"	 => date('Y-m-d H:i:s', strtotime($item->sale_dt)),
                 "shk_id" => $item->shk_id,	
                 "retail_price_withdisc_rub"	 => $item->retail_price_withdisc_rub,
                 "delivery_amount" => $item->delivery_amount,
@@ -110,19 +133,20 @@ class ApiController extends Controller
                 "ppvz_vw" => $item->ppvz_vw,
                 "ppvz_vw_nds" => $item->ppvz_vw_nds,
                 "ppvz_office_id"	 => $item->ppvz_office_id,
-                "ppvz_office_name"	 => $item->ppvz_office_name,
+                "ppvz_office_name"	 => isset($item->ppvz_office_name) ? $item->ppvz_office_name : "",
                 "ppvz_supplier_id" => $item->ppvz_supplier_id,
                 "ppvz_supplier_name" => $item->ppvz_supplier_name,	
                 "ppvz_inn" => $item->ppvz_inn,
                 "declaration_number" => $item->declaration_number,	
-                // "bonus_type_name" => $item->bonus_type_name,	
+                "bonus_type_name" => isset($item->bonus_type_name) ? $item->bonus_type_name : "",	
                 "sticker_id" => $item->sticker_id,	
                 "site_country" => $item->site_country,	
                 "penalty"	 => $item->penalty,
                 "additional_payment" => $item->additional_payment,
-                // "kiz" => $item->kiz,	
+                "kiz" => isset($item->kiz) ? $item->kiz : "",	
                 "srid" => $item->srid,	
             ]);
         }
+        
     }
 }
