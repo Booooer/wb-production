@@ -9,14 +9,16 @@ use App\Models\Sale;
 
 class ApiController extends Controller
 {
-    private function getContext($api){
+    private $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
+
+    private function getContext(){
         $options = [
             'http' => [
                 'method' => 'GET',
                 'header' => [
                     'accept: application/json',
                     'content-type: application/json',
-                    "Authorization: $api"
+                    "Authorization: $this->api",
                 ]
             ]
         ];
@@ -26,11 +28,10 @@ class ApiController extends Controller
     
 
     public function updateStorage(Request $request){
-        $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
         $dateFrom = $request->dateFrom ? $request->dateFrom : date('Y-m-d', time() - 86400);
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/stocks?dateFrom=$dateFrom";
 
-        $context = $this->getContext($api);
+        $context = $this->getContext();
 
         $result = json_decode(file_get_contents($url, false, $context));
 
@@ -58,7 +59,6 @@ class ApiController extends Controller
                 'Discount' => $item->Discount,
             ]);
         }
-        s
         return "Код 200: Обновление базы данных 'storage' прошло успешно";
     }
         
@@ -71,10 +71,11 @@ class ApiController extends Controller
 
         
 
-        $context = $this->getContext($api);
+        $context = $this->getContext();
 
         $result = json_decode(file_get_contents($url, false, $context));
         
+        // Предварительное очищение бд перед заполнением
         Realization::truncate();
 
         foreach($result as $item){
@@ -146,7 +147,7 @@ class ApiController extends Controller
         $dateFrom = $request->dateFrom;
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=$dateFrom";
 
-        $context = $this->getContext($api);
+        $context = $this->getContext();
 
         $result = json_decode(file_get_contents($url, false, $context));
 
