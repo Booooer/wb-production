@@ -27,7 +27,7 @@ class ApiController extends Controller
 
     public function updateStorage(Request $request){
         $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
-        $dateFrom = $request->dateFrom;
+        $dateFrom = $request->dateFrom ? $request->dateFrom : date('Y-m-d', time() - 86400);
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/stocks?dateFrom=$dateFrom";
 
         $context = $this->getContext($api);
@@ -58,8 +58,8 @@ class ApiController extends Controller
                 'Discount' => $item->Discount,
             ]);
         }
-        
-        return "Код 200: Обновление базы данных прошло успешно";
+        s
+        return "Код 200: Обновление базы данных 'storage' прошло успешно";
     }
         
     public function updateRealizations(Request $request){
@@ -138,7 +138,7 @@ class ApiController extends Controller
             ]);
         }
 
-        return "Код 200: Обновление базы данных прошло успешно";
+        return "Код 200: Обновление базы данных 'realizations' прошло успешно";
     }
 
     public function updateSales(Request $request){
@@ -187,6 +187,10 @@ class ApiController extends Controller
             ]);
         }
         
-        return "Код 200: Обновление базы данных прошло успешно";
+        return "Код 200: Обновление базы данных 'sales' прошло успешно";
+    }
+
+    public function updateOrders(Request $request){
+        return "Этот метод ещё в разработке";
     }
 }

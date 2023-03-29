@@ -23,3 +23,5 @@ Route::post('update/realizations', 'App\Http\Controllers\ApiController@updateRea
     ->name('update.realizations');
 Route::post('update/sales', 'App\Http\Controllers\ApiController@updateSales')
     ->name('update.sales');          
+Route::post('update/orders', 'App\Http\Controllers\ApiController@updateOrders')
+    ->name('update.orders');

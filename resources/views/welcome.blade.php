@@ -12,15 +12,15 @@
 <body>
     <div class="content">
         <select name="data" class="switch-table-name">
-            <option value="Склад">Склад</option>
-            <option value="Реализация">Реализация</option>
-            <option value="Продажи">Продажи</option>
-            <option value="Заказы">Заказы</option>
+            <option value="storage">Склад</option>
+            <option value="realizations">Реализация</option>
+            <option value="sales">Продажи</option>
+            <option value="orders">Заказы</option>
         </select>
-        <form class="field-api" action="{{ route('update.sales') }}" method="post">
+        <form class="field-api" action="{{ route('update.storage') }}" method="post" id="form-api">
             @csrf
             <p id="table-name">Без fetch</p>   
-            <input type="date" name="dateFrom" placeholder="Начальная дата" required>
+            <input type="date" name="dateFrom" placeholder="Начальная дата">
             <input type="date" name="dateTo" placeholder="Конечная дата">        
             <button type="submit">Отправить</button>
         </form>
