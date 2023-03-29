@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Storage;
 use App\Models\Realization;
+use App\Models\Sale;
 
 class ApiController extends Controller
 {
@@ -137,6 +138,55 @@ class ApiController extends Controller
             ]);
         }
 
+        return "Код 200: Обновление базы данных прошло успешно";
+    }
+
+    public function updateSales(Request $request){
+        $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
+        $dateFrom = $request->dateFrom;
+        $url = "https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=$dateFrom";
+
+        $context = $this->getContext($api);
+
+        $result = json_decode(file_get_contents($url, false, $context));
+
+        // Предварительное очищение бд перед заполнением
+        Sale::truncate();
+
+        foreach($result as $item){
+            Sale::create([
+                "srid" => $item->srid,
+                "date" => $item->date,
+                "lastChangeDate" => $item->lastChangeDate,
+                "supplierArticle" => $item->supplierArticle,
+                "techSize" => $item->techSize,
+                "barcode" => $item->barcode,
+                "totalPrice" => $item->totalPrice,
+                "discountPercent" => $item->discountPercent,
+                "isSupply" => $item->isSupply,
+                "isRealization" => $item->isRealization,
+                "promoCodeDiscount" => $item->promoCodeDiscount,
+                "warehouseName" => $item->warehouseName,
+                "countryName" => $item->countryName,
+                "oblastOkrugName" => $item->oblastOkrugName,
+                "regionName" => $item->regionName,
+                "incomeID" => $item->incomeID,
+                "saleID" => $item->saleID,
+                "odid" => $item->odid,
+                "spp" => $item->spp,
+                "forPay" => $item->forPay,
+                "finishedPrice" => $item->finishedPrice,
+                "priceWithDisc" => $item->priceWithDisc,
+                "nmId" => $item->nmId,
+                "subject" => $item->subject,
+                "category" => $item->category,
+                "brand" => $item->brand,
+                "IsStorno" => $item->IsStorno,
+                "gNumber" => $item->gNumber,
+                "sticker" => $item->sticker,
+            ]);
+        }
+        
         return "Код 200: Обновление базы данных прошло успешно";
     }
 }

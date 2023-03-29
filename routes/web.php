@@ -20,4 +20,6 @@ Route::get('/', function () {
 Route::post('update/storage', 'App\Http\Controllers\ApiController@updateStorage')
     ->name('update.storage');
 Route::post('update/realizations', 'App\Http\Controllers\ApiController@updateRealizations')
-    ->name('update.realizations');    
+    ->name('update.realizations');
+Route::post('update/sales', 'App\Http\Controllers\ApiController@updateSales')
+    ->name('update.sales');          

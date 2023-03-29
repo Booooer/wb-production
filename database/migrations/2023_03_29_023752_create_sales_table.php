@@ -14,7 +14,35 @@ return new class extends Migration
     public function up()
     {
         Schema::create('sales', function (Blueprint $table) {
-            $table->id();
+            $table->string('srid')->nullable();
+            $table->dateTime("date");
+            $table->dateTime("lastChangeDate");
+            $table->string("supplierArticle");
+            $table->string("techSize");
+            $table->string("barcode");
+            $table->bigInteger("totalPrice");
+            $table->integer("discountPercent");
+            $table->boolean("isSupply");
+            $table->boolean("isRealization");
+            $table->bigInteger("promoCodeDiscount");
+            $table->string("warehouseName");
+            $table->string("countryName");
+            $table->string("oblastOkrugName");
+            $table->string("regionName");
+            $table->bigInteger("incomeID");
+            $table->string("saleID");
+            $table->bigInteger("odid");
+            $table->bigInteger("spp");
+            $table->bigInteger("forPay");
+            $table->bigInteger("finishedPrice");
+            $table->bigInteger("priceWithDisc");
+            $table->bigInteger("nmId");
+            $table->string("subject");
+            $table->string("category");
+            $table->string("brand");
+            $table->string("IsStorno");
+            $table->string("gNumber");
+            $table->string("sticker");
             $table->timestamps();
         });
     }

@@ -17,7 +17,7 @@
         <input type="date" name="date" id="date">    
         <button type="button" class="btnCall">Отправить</button>
     </form>
-    <form class="field-api" action="{{ route('update.storage') }}" method="post">
+    <form class="field-api" action="{{ route('update.sales') }}" method="post">
         @csrf
         <p>Без fetch</p>   
         <input type="date" name="dateFrom" placeholder="Начальная дата">
