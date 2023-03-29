@@ -20,9 +20,9 @@ class ApiController extends Controller
             ]
         ];
 
-<<<<<<< HEAD
         return stream_context_create($options);
     }
+    
 
     public function updateStorage(Request $request){
         $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
@@ -32,6 +32,9 @@ class ApiController extends Controller
         $context = $this->getContext($api);
 
         $result = json_decode(file_get_contents($url, false, $context));
+
+        // Предварительное очищение бд перед заполнением
+        Storage::truncate();
 
         foreach($result as $item){
             Storage::create([
@@ -55,67 +58,23 @@ class ApiController extends Controller
             ]);
         }
         
+        return "Код 200: Обновление базы данных прошло успешно";
     }
-
-    public function updateRealizations(Request $request){
-=======
-    //     // foreach($json as $item){
-    //     //     Storage::create([
-    //     //         'nmId' => $item->nmId
-    //     //         'lastChangeDate' => $item->lastChangeDate
-    //     //         'supplierArticle' => $item->supplierArticle
-    //     //         'techSize' => $item->techSize
-    //     //         'barcode' => $item->barcode
-    //     //         'quantity' => $item->quantity
-    //     //         'isSupply' => $item->isSupply
-    //     //         'isRealization' => $item->isRealization
-    //     //         'quantityFull' => $item->quantityFull
-    //     //         'warehouseName' => $item->warehouseName
-    //     //         'subject' => $item->subject
-    //     //         'category' => $item->category
-    //     //         'daysOnSite' => $item->daysOnSite
-    //     //         'brand' => $item->brand
-    //     //         'SCCode' => $item->SCCode
-    //     //         'Price' => $item->Price
-    //     //         'Discount' => $item->Discount
-    //     //     ]);
-    //     // }
-    //     return $json;
-    // }
         
-    public function parseData(Request $request){
->>>>>>> a1e2901efce1cad0122a9f0386b672c4d07fe95b
+    public function updateRealizations(Request $request){
+
         $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=$dateFrom&dateTo=$dateTo";
-        $path = "";
 
-        if (!empty($dateFrom)) {
-            $path .= "?dateFrom=$dateFrom";
-        }
-        if (!empty($dateTo)) {
-            $path .= "dateTo=$dateTo";
-        }
+        
 
-        $options = [
-            'http' => [
-                'method' => 'GET',
-                'header' => [
-                    'accept: application/json',
-                    'content-type: application/json',
-                    "Authorization: $api"
-                ]
-            ]
-        ];
-
-        $context = stream_context_create($options);
+        $context = $this->getContext($api);
 
         $result = json_decode(file_get_contents($url, false, $context));
-
-        // dd($result);
         
-        Realization::destroy();
+        Realization::truncate();
 
         foreach($result as $item){
             Realization::create([
@@ -177,6 +136,7 @@ class ApiController extends Controller
                 "srid" => $item->srid,	
             ]);
         }
-        
+
+        return "Код 200: Обновление базы данных прошло успешно";
     }
 }

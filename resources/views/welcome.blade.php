@@ -19,9 +19,7 @@
     </form>
     <form class="field-api" action="{{ route('update.storage') }}" method="post">
         @csrf
-        <p>Без fetch</p>
-        <input type="text" name="url" id="url" placeholder="введите url" required>
-        <input type="text" name="api" id="api" placeholder="введите api" required>    
+        <p>Без fetch</p>   
         <input type="date" name="dateFrom" placeholder="Начальная дата">
         <input type="date" name="dateTo" placeholder="Конечная дата">        
         <button type="submit">Отправить</button>
