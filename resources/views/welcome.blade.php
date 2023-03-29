@@ -10,13 +10,12 @@
     <title>Document</title>
 </head>
 <body>
-    <form class="field-api">
-        @csrf
-        <input type="text" id="url" placeholder="введите url">
-        <input type="text" id="api" placeholder="введите api">    
-        <input type="date" name="date" id="date">    
-        <button type="button" class="btnCall">Отправить</button>
-    </form>
+    <select name="data">
+        <option value="Склад">Склад</option>
+        <option value="Реализация">Реализация</option>
+        <option value="Продажи">Продажи</option>
+        <option value="Заказы">Заказы</option>
+    </select>
     <form class="field-api" action="{{ route('update.sales') }}" method="post">
         @csrf
         <p>Без fetch</p>   
@@ -24,9 +23,6 @@
         <input type="date" name="dateTo" placeholder="Конечная дата">        
         <button type="submit">Отправить</button>
     </form>
-    <div class="answer">
-        
-    </div>
 <script src="js/app.js"></script>    
 </body>
 </html>
