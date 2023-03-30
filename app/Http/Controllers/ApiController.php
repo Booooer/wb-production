@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Storage;
 use App\Models\Realization;
 use App\Models\Sale;
+use App\Models\Order;
 
 class ApiController extends Controller
 {
@@ -63,8 +64,6 @@ class ApiController extends Controller
     }
         
     public function updateRealizations(Request $request){
-
-        $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=$dateFrom&dateTo=$dateTo";
@@ -143,7 +142,6 @@ class ApiController extends Controller
     }
 
     public function updateSales(Request $request){
-        $api = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3NJRCI6ImZjNGUyZDNmLWVkZDgtNDRhZi05YjNlLTlkZGM0YzhiMDRjNCJ9.2ykXlcgfHf7t7ecLo1alJa3dn-K_NiIWFSHkeXkr-vg";
         $dateFrom = $request->dateFrom;
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=$dateFrom";
 
@@ -192,6 +190,40 @@ class ApiController extends Controller
     }
 
     public function updateOrders(Request $request){
-        return "Этот метод ещё в разработке";
+        $dateFrom = $request->dateFrom;
+        $url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=$dateFrom";
+
+        $context = $this->getContext();
+
+        $result = json_decode(file_get_contents($url, false, $context));
+
+        Order::truncate();
+
+        foreach($result as $item){
+            Order::create([
+                "date" => $item->date,
+                "lastChangeDate" => $item->lastChangeDate,
+                "supplierArticle" => $item->supplierArticle,
+                "techSize" => $item->techSize,
+                "barcode" => $item->barcode,
+                "totalPrice" => $item->totalPrice,
+                "discountPercent" => $item->discountPercent,
+                "warehouseName" => $item->warehouseName,
+                "oblast" => $item->oblast,
+                "incomeID" => $item->incomeID,
+                "odid" => $item->odid,
+                "nmId" => $item->nmId,
+                "subject" => $item->subject,
+                "category" => $item->category,
+                "brand" => $item->brand,
+                "isCancel" => $item->isCancel,
+                "cancel_dt" => $item->cancel_dt,
+                "gNumber" => $item->gNumber,
+                "sticker" => $item->sticker,
+                "srid" => $item->srid,
+            ]);
+        }
+
+        return "Код 200: Обновление базы данных 'orders' прошло успешно";
     }
 }
