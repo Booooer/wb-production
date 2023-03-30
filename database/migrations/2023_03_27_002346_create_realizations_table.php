@@ -18,7 +18,7 @@ return new class extends Migration
             $table->dateTime('date_from');
             $table->dateTime('date_to');
             $table->dateTime('create_dt');
-            $table->string('suppliercontract_code')->nullable;
+            $table->string('suppliercontract_code')->nullable();
             $table->bigInteger('rrd_id');
             $table->bigInteger('gi_id');
             $table->string('subject_name');
