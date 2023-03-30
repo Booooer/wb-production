@@ -43,6 +43,7 @@ return new class extends Migration
             $table->string("IsStorno");
             $table->string("gNumber");
             $table->string("sticker");
+            $table->boolean('isRefund');
             $table->timestamps();
         });
     }

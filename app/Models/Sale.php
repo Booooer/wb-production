@@ -39,5 +39,6 @@ class Sale extends Model
         "IsStorno",
         "gNumber",
         "sticker",
+        'isRefund',
     ];
 }

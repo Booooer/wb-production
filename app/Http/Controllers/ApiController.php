@@ -183,6 +183,7 @@ class ApiController extends Controller
                 "IsStorno" => $item->IsStorno,
                 "gNumber" => $item->gNumber,
                 "sticker" => $item->sticker,
+                "isRefund" => $item->totalPrice < 0 ? true : false,
             ]);
         }
         
