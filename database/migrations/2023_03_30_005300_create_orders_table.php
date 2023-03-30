@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string("warehouseName");
             $table->string("oblast");
             $table->integer("incomeID");
-            $table->integer("odid");
+            $table->bigInteger("odid");
             $table->integer("nmId");
             $table->string("subject");
             $table->string("category");
