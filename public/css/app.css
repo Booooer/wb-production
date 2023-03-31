@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 *{
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
 }
+
 ::-webkit-input-placeholder {color:#fff;}
 ::-moz-placeholder          {color:#fff;}/* Firefox 19+ /
 :-moz-placeholder           {color:#c0392b;}/ Firefox 18- */
