@@ -222,6 +222,7 @@ class ApiController extends Controller
                 "gNumber" => $item->gNumber,
                 "sticker" => $item->sticker,
                 "srid" => $item->srid,
+                'link' => "https://www.wildberries.ru/catalog/$item->nmId/detail.aspx",
             ]);
         }
 

@@ -30,5 +30,6 @@ class Order extends Model
         "gNumber",
         "sticker",
         "srid",
+        'link',
     ];
 }
