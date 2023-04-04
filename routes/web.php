@@ -17,7 +17,7 @@ Route::get('/','App\Http\Controllers\DataController@welcome');
 Route::get('/{range}','App\Http\Controllers\DataController@welcome')
     ->whereAlpha('range')
     ->name('welcome');
-Route::post('update/storage', 'App\Http\Controllers\ApiController@updateStorage')
+Route::get('update/storage', 'App\Http\Controllers\ApiController@updateStorage')
     ->name('update.storage');
 Route::post('update/realizations', 'App\Http\Controllers\ApiController@updateRealizations')
     ->name('update.realizations');

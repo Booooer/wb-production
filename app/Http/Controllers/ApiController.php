@@ -28,16 +28,13 @@ class ApiController extends Controller
     }
     
 
-    public function updateStorage(Request $request){
-        $dateFrom = $request->dateFrom ? $request->dateFrom : date('Y-m-d', time() - 86400);
+    public function updateStorage(){
+        $dateFrom = date('Y-m-d', time() - 86400);
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/stocks?dateFrom=$dateFrom";
 
         $context = $this->getContext();
 
         $result = json_decode(file_get_contents($url, false, $context));
-
-        // Предварительное очищение бд перед заполнением
-        Storage::truncate();
 
         foreach($result as $item){
             Storage::create([
@@ -67,8 +64,6 @@ class ApiController extends Controller
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=$dateFrom&dateTo=$dateTo";
-
-        
 
         $context = $this->getContext();
 
