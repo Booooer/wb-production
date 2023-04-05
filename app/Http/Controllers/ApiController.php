@@ -136,8 +136,8 @@ class ApiController extends Controller
         return "Код 200: Обновление базы данных 'realizations' прошло успешно";
     }
 
-    public function updateSales(Request $request){
-        $dateFrom = $request->dateFrom;
+    public function updateSales(){
+        $dateFrom = $dateFrom = date("Y-01-01");
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=$dateFrom";
 
         $context = $this->getContext();
@@ -186,7 +186,7 @@ class ApiController extends Controller
     }
 
     public function updateOrders(Request $request){
-        $dateFrom = $request->dateFrom;
+        $dateFrom = date("Y-01-01");
         $url = "https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=$dateFrom";
 
         $context = $this->getContext();
@@ -218,6 +218,7 @@ class ApiController extends Controller
                 "sticker" => $item->sticker,
                 "srid" => $item->srid,
                 'link' => "https://www.wildberries.ru/catalog/$item->nmId/detail.aspx",
+                'PriceWithDisc' => $item->totalPrice - ($item->totalPrice * ($item->discountPercent / 100)),
             ]);
         }
 

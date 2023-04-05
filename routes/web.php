@@ -21,7 +21,7 @@ Route::get('update/storage', 'App\Http\Controllers\ApiController@updateStorage')
     ->name('update.storage');
 Route::post('update/realizations', 'App\Http\Controllers\ApiController@updateRealizations')
     ->name('update.realizations');
-Route::post('update/sales', 'App\Http\Controllers\ApiController@updateSales')
+Route::get('update/sales', 'App\Http\Controllers\ApiController@updateSales')
     ->name('update.sales');          
-Route::post('update/orders', 'App\Http\Controllers\ApiController@updateOrders')
+Route::get('update/orders', 'App\Http\Controllers\ApiController@updateOrders')
     ->name('update.orders');
