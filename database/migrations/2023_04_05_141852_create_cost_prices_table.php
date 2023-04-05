@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('cost_prices', function (Blueprint $table) {
             $table->bigInteger('article_wb');
             $table->integer('costPrice');
-            $table->bigInteger('article');
+            $table->string('article');
             $table->string('brand');
             $table->timestamps();
         });
