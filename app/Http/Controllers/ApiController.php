@@ -8,6 +8,7 @@ use App\Models\Realization;
 use App\Models\Sale;
 use App\Models\Order;
 use App\Models\Total;
+use App\Models\CostPrice;
 
 class ApiController extends Controller
 {
@@ -28,6 +29,16 @@ class ApiController extends Controller
         return stream_context_create($options);
     }
     
+    private function getStatus($logisticsRefund, $isCancel){
+        if($logisticsRefund == 0 && !$isCancel){
+            return "Выкуплен";
+        }
+        if ($logisticsRefund > 0 && !$isCancel) {
+            return "Возврат";
+        }
+        
+        return "Отказ";              
+    }
 
     public function updateStorage(){
         $dateFrom = date('Y-m-d', time() - 86400);
@@ -84,7 +95,7 @@ class ApiController extends Controller
                 "gi_id" => $item->gi_id,	
                 "subject_name" => $item->subject_name,	
                 "nm_id"	 => $item->nm_id,
-                "brand_name" => $item->brand_name,	
+                "brand_name" => isset($item->brand_name) ? $item->brand_name : "",	
                 "sa_name" => $item->sa_name,	
                 "ts_name" => $item->ts_name,
                 "barcode" => $item->barcode,
@@ -94,7 +105,7 @@ class ApiController extends Controller
                 "retail_amount"	 => $item->retail_amount,
                 "sale_percent"	 => $item->sale_percent,
                 "commission_percent" => $item->commission_percent,
-                "office_name" => $item->office_name,
+                "office_name" => isset($item->office_name) ? $item->office_name : "",
                 "supplier_oper_name" => $item->supplier_oper_name,
                 "order_dt"	 => date('Y-m-d H:i:s', strtotime($item->order_dt)),
                 "sale_dt" => date('Y-m-d H:i:s', strtotime($item->sale_dt)),
@@ -227,9 +238,13 @@ class ApiController extends Controller
     }
 
     public function updateTotals(){
+        set_time_limit(0);
+
         $orders = Order::all();
         $sales = Sale::all();
         $realization = Realization::all();
+        $ss = CostPrice::all();
+        $storage = Storage::all();
 
         Total::truncate();
 
@@ -237,58 +252,50 @@ class ApiController extends Controller
             Total::create([
                 "gNumber" => $order->gNumber,
                 "srid" => $order->srid,
-                "barcode" => $order->srid,
+                "barcode" => $order->barcode,
                 "PriceWithDisc" => $order->priceWithDisc,
-                "dateOrder" => $order->date,
+                "dateOrder" => $dateOrder = $realization->where('srid',$order->srid)->value('order_dt'),
                 "isCancel" => $isCancel = $order->isCancel,
                 "cancel_dt" => $order->cancel_dt,
                 "nmId" => $order->nmId,
                 "supplierArticle" => $order->supplierArticle,
-                "dateSale" => $sales->where('srid',$order->srid)->value('date'),
-                "retail_price_withdisc_rub" => $realization->where('srid',$order->srid)->value('retail_price_withdisc_rub'),
+                "dateSale" => $dateSale = $realization->where('srid',$order->srid)->value('sale_dt'),
+                "retail_price_withdisc_rub" => $retailPrice = $realization->where('srid',$order->srid)->value('retail_price_withdisc_rub'),
                 "retail_amount" => $retail_amount = $realization->where('srid',$order->srid)->value('retail_amount'),
                 "ppvz_for_pay" => $ppvz_for_pay = $realization->where('srid',$order->srid)->value('ppvz_for_pay'),
-                "logistics" => $logistics = if ($realization->where('srid',$order->srid)->value('delivery_amount') || $realization->where('srid',$order->srid)->value('return_amount')) ? $realization->where('srid',$order->srid)->value('delivery_rub') : $realization->where('srid',$order->srid)->value('product_discount_for_report'),
-                "logisticsRefund" => $logisticsRefund = if ($realization->where('srid',$order->srid)->value('return_amount')) ? $realization->where('srid',$order->srid)->value('delivery_rub') : 0,
+                "logistics" => $logistics = $realization->where('srid',$order->srid)->value('delivery_amount') || $realization->where('srid',$order->srid)->value('return_amount') ?  $realization->where('srid',$order->srid)->value('delivery_rub') : $realization->where('srid',$order->srid)->value('product_discount_for_report'),
+                "logisticsRefund" => $logisticsRefund = $realization->where('srid',$order->srid)->value('return_amount') ? $realization->where('srid',$order->srid)->value('delivery_rub') : 0,
                 "penalty" => $penalty = $realization->where('srid',$order->srid)->value('penalty'),
                 "surcharge" => $surcharge = $realization->where('srid',$order->srid)->value('additional_payment'), 
                 "commission_wb" => $commission_wb = $retail_amount - $ppvz_for_pay,
-                "costPrice" => $costPrice,
-                "advert_budget" =>,
+                "costPrice" => $costPrice = $ss->where('article_wb',$order->nmId)->value('costPrice') ? $ss->where('article_wb',$order->nmId)->value('costPrice') : null,
+                "advert_budget" => 0, // доделать 
                 "count_orders" => count($orders->where('supplierArticle',$order->supplierArticle)),
-                "spo" =>,
-                "marginality_rub" => $marginality_rub = $retail_amount - $logistics - $logisticsRefund - $penalty - $surcharge - $commission_wb - $costPrice,
-                "marginality_percent" => ($marginality_rub / $retail_amount) * 100,
-                "days_on_the_road" =>,
-                "status" => if($logisticsRefund == 0 && !$isCancel){
-                                "Выкуплен";
-                            }
-                            if ($logisticsRefund > 0 && !$isCancel) {
-                                "Возврат";
-                            }
-                            else{
-                                "Отказ";
-                            },
+                "spo" => 0, // доделать 
+                "marginality_rub" => $marginality_rub = $retail_amount - $logistics - $logisticsRefund - $penalty - $surcharge - $commission_wb - $costPrice, // проверить на отсутствие retail_amount
+                "marginality_percent" => $retail_amount > 0 ? ($marginality_rub / $retail_amount) * 100 : 0,
+                "days_on_the_road" => ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) > 0 ? ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) : 0,
+                "status" => $status = $this->getStatus($logisticsRefund, $isCancel), // оптимизировать
                 "orders_things" => isset($order->srid) ? 1 : 0,
-                "buyout_rub" =>,
-                "buyout_things" =>,
-                "refuse_rub" =>,
-                "refuse_things" =>,
-                "refund_rub" =>,
-                "refund_things" =>,
-                "inTransit_rub" =>,
-                "inTransit_things" =>,
-                "category" =>,
-                "subject" =>,
-                "storage" =>,
-                "SPP_rub" =>,
-                "SPP_percent" =>,
-                "countryName" =>,
-                "oblastOkrugName" =>,
-                "regionName" =>,
-                "brand" =>,
-                "avg_days_buyout" =>,
-                "quantity" =>,
+                "buyout_rub" => $status == "Выкуплен" ? $retailPrice : 0,
+                "buyout_things" => $status == "Выкуплен" ? 1 : 0,
+                "refuse_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+                "refuse_things" => $status == "Выкуплен" ? 0 : 1,
+                "refund_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+                "refund_things" => $status == "Выкуплен" ? 0 : 1,
+                "inTransit_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+                "inTransit_things" => $status == "Выкуплен" ? 1 : 0,
+                "category" => $order->category,
+                "subject" => $order->subject,
+                "storage" => $order->warehouseName,
+                "SPP_rub" => $spp_rub = $retailPrice - $retail_amount,
+                "SPP_percent" => $retailPrice > 0 ? 100 * ($spp_rub / $retailPrice) : 0,
+                "countryName" => $sales->where('srid',$order->srid)->value('countryName'),
+                "oblastOkrugName" => $sales->where('srid',$order->srid)->value('oblastOkrugName'),
+                "regionName" => $sales->where('srid',$order->srid)->value('regionName'),
+                "brand" => $sales->where('srid',$order->srid)->value('brand'),
+                "avg_days_buyout" => 0, // доделать 
+                "quantity" => $storage->where('supplierArticle',$order->supplierArticle)->where('warehouseName',$order->warehouseName)->sum('quantity'),
             ]);
         }
     }

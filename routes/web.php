@@ -26,3 +26,5 @@ Route::get('update/sales', 'App\Http\Controllers\ApiController@updateSales')
     ->name('update.sales');          
 Route::get('update/orders', 'App\Http\Controllers\ApiController@updateOrders')
     ->name('update.orders');
+    Route::get('update/totals', 'App\Http\Controllers\ApiController@updateTotals')
+    ->name('update.totals');    
