@@ -31,5 +31,6 @@ class Order extends Model
         "sticker",
         "srid",
         'link',
+        'PriceWithDisc',
     ];
 }

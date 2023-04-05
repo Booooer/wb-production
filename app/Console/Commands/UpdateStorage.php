@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\Storage;
 
-class Daily extends Command
+class UpdateStorage extends Command
 {
     /**
      * The name and signature of the console command.
