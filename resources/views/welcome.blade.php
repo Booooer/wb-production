@@ -17,13 +17,6 @@
             <option value="realizations">Реализация</option>
             <option value="sales">Продажи</option>
             <option value="orders">Заказы</option>
-            <!-- Всё для тебя, рассветы и туманы
-Для тебя моря и океаны
-Для тебя цветочные поляны для тебя
-Лишь для тебя горят на небе звёзды
-Для тебя безумный мир наш создан
-Для тебя живу и я под солнцем для тебя
-Лишь для тебя живу и я под солнцем для тебя -->
         </select>
         <form class="field-api" action="{{ route('update.storage') }}" method="post" id="form-api">
             @csrf   

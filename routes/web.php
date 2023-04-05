@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/check','App\Http\Controllers\DataController@check');  
 
 Route::get('/','App\Http\Controllers\DataController@welcome');  
 Route::get('/{range}','App\Http\Controllers\DataController@welcome')

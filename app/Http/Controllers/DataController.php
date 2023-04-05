@@ -30,6 +30,10 @@ class DataController extends Controller
         return view('welcome',compact('sum','refund','count','range'));
     }
 
+    public function check(){
+        return view('index');
+    }
+
     private function getData($range){
         switch ($range) {
             case 'yesterday':
