@@ -20,6 +20,7 @@ class Total extends Model
         "nmId",
         "supplierArticle",
         "dateSale",
+        "retail_price_withdisc_rub",
         "retail_amount",
         "ppvz_for_pay",
         "logistics",

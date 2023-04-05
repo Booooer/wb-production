@@ -7,6 +7,7 @@ use App\Models\Storage;
 use App\Models\Realization;
 use App\Models\Sale;
 use App\Models\Order;
+use App\Models\Total;
 
 class ApiController extends Controller
 {
@@ -223,5 +224,72 @@ class ApiController extends Controller
         }
 
         return "Код 200: Обновление базы данных 'orders' прошло успешно";
+    }
+
+    public function updateTotals(){
+        $orders = Order::all();
+        $sales = Sale::all();
+        $realization = Realization::all();
+
+        Total::truncate();
+
+        foreach($orders as $order) { 
+            Total::create([
+                "gNumber" => $order->gNumber,
+                "srid" => $order->srid,
+                "barcode" => $order->srid,
+                "PriceWithDisc" => $order->priceWithDisc,
+                "dateOrder" => $order->date,
+                "isCancel" => $isCancel = $order->isCancel,
+                "cancel_dt" => $order->cancel_dt,
+                "nmId" => $order->nmId,
+                "supplierArticle" => $order->supplierArticle,
+                "dateSale" => $sales->where('srid',$order->srid)->value('date'),
+                "retail_price_withdisc_rub" => $realization->where('srid',$order->srid)->value('retail_price_withdisc_rub'),
+                "retail_amount" => $retail_amount = $realization->where('srid',$order->srid)->value('retail_amount'),
+                "ppvz_for_pay" => $ppvz_for_pay = $realization->where('srid',$order->srid)->value('ppvz_for_pay'),
+                "logistics" => $logistics = if ($realization->where('srid',$order->srid)->value('delivery_amount') || $realization->where('srid',$order->srid)->value('return_amount')) ? $realization->where('srid',$order->srid)->value('delivery_rub') : $realization->where('srid',$order->srid)->value('product_discount_for_report'),
+                "logisticsRefund" => $logisticsRefund = if ($realization->where('srid',$order->srid)->value('return_amount')) ? $realization->where('srid',$order->srid)->value('delivery_rub') : 0,
+                "penalty" => $penalty = $realization->where('srid',$order->srid)->value('penalty'),
+                "surcharge" => $surcharge = $realization->where('srid',$order->srid)->value('additional_payment'), 
+                "commission_wb" => $commission_wb = $retail_amount - $ppvz_for_pay,
+                "costPrice" => $costPrice,
+                "advert_budget" =>,
+                "count_orders" => count($orders->where('supplierArticle',$order->supplierArticle)),
+                "spo" =>,
+                "marginality_rub" => $marginality_rub = $retail_amount - $logistics - $logisticsRefund - $penalty - $surcharge - $commission_wb - $costPrice,
+                "marginality_percent" => ($marginality_rub / $retail_amount) * 100,
+                "days_on_the_road" =>,
+                "status" => if($logisticsRefund == 0 && !$isCancel){
+                                "Выкуплен";
+                            }
+                            if ($logisticsRefund > 0 && !$isCancel) {
+                                "Возврат";
+                            }
+                            else{
+                                "Отказ";
+                            },
+                "orders_things" => isset($order->srid) ? 1 : 0,
+                "buyout_rub" =>,
+                "buyout_things" =>,
+                "refuse_rub" =>,
+                "refuse_things" =>,
+                "refund_rub" =>,
+                "refund_things" =>,
+                "inTransit_rub" =>,
+                "inTransit_things" =>,
+                "category" =>,
+                "subject" =>,
+                "storage" =>,
+                "SPP_rub" =>,
+                "SPP_percent" =>,
+                "countryName" =>,
+                "oblastOkrugName" =>,
+                "regionName" =>,
+                "brand" =>,
+                "avg_days_buyout" =>,
+                "quantity" =>,
+            ]);
+        }
     }
 }
