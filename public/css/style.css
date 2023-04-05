@@ -62,7 +62,7 @@ a .login p{
 }
 
 main{
-    height: calc(100vh - 60px);
+    height: calc(100vh - 70px);
     display: inherit;
     align-items: center;
 }
