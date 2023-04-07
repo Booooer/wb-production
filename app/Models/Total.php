@@ -57,4 +57,8 @@ class Total extends Model
         "avg_days_buyout",
         "quantity",
     ];
+
+    public function advert(){
+        return $this->hasOne(AdvertInfo::class);
+    }
 }

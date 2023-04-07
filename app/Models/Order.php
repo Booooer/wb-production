@@ -33,4 +33,8 @@ class Order extends Model
         'link',
         'PriceWithDisc',
     ];
+
+    public function advert(){
+        return $this->hasOne(AdvertInfo::class);
+    }
 }
