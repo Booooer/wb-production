@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('storage:update')
-            ->daily()->at('23:00'); // МСК 
+            ->daily()->at('23:00'); // МСК lsdsdsgit
     }
 
     /**
