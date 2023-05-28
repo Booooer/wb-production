@@ -35,6 +35,6 @@ class Order extends Model
     ];
 
     public function advert(){
-        return $this->hasOne(AdvertInfo::class);
+        return $this->hasOne('App\Models\AdvertInfo');
     }
 }

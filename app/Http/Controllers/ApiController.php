@@ -257,74 +257,77 @@ class ApiController extends Controller
     public function updateTotals(){
         set_time_limit(0);
 
-        $orders = Order::all();
+        dd(file_get_contents("https://www.wildberries.ru/catalog/123708115/detail.aspx?targetUrl=BP"));
 
-        Total::truncate();
+        // $orders = Order::all();
 
-        $orders = Order::chunk(100, function($orders){
-            foreach($orders as $order) { 
-                $realization = Realization::where('srid',$order->srid)->get();
+        // Total::truncate();
+
+        // $orders = Order::chunk(100, function($orders){
+        //     foreach($orders as $order) { 
+        //         $realization = Realization::where('srid',$order->srid)->get();
 
                 
-                $check = $this->mergeRealizations($realization);
+                
+        //         $check = $this->mergeRealizations($realization);
 
-                $realization = $check;
+        //         $realization = $check;
                 
 
-                // dd($realization[0]->order_dt);
+        //         // dd($realization[0]->order_dt);
 
-                $sale = Sale::where('srid',$order->srid)->first();
+        //         $sale = Sale::where('srid',$order->srid)->first();
 
-                Total::create([
-                    "gNumber" => $order->gNumber,
-                    "srid" => $order->srid,
-                    "barcode" => $order->barcode,
-                    "PriceWithDisc" => $order->priceWithDisc,
-                    "dateOrder" => $dateOrder = !empty($realization->order_dt) ? $realization->order_dt : null,
-                    "isCancel" => $isCancel = $order->isCancel,
-                    "cancel_dt" => $order->cancel_dt,
-                    "nmId" => $order->nmId,
-                    "supplierArticle" => $order->supplierArticle,
-                    "dateSale" => $dateSale = !empty($realization->sale_dt) ? $realization->sale_dt : null,
-                    "retail_price_withdisc_rub" => $retailPrice = !empty($realization->retail_price_withdisc_rub) ? $realization->retail_price_withdisc_rub : 0,
-                    "retail_amount" => $retail_amount = !empty($realization->retail_amount) ? $realization->retail_amount : 0,
-                    "ppvz_for_pay" => $ppvz_for_pay = !empty($realization->ppvz_for_pay) ? $realization->ppvz_for_pay : 0,
-                    "logistics" => $logistics = !empty($realization->delivery_amount) || !empty($realization->return_amount) ?  $realization->delivery_rub : (!empty($realization->product_discount_for_report) ? $realization->product_discount_for_report : null),
-                    "logisticsRefund" => $logisticsRefund = !empty($realization->return_amount) ? $realization->delivery_rub : 0,
-                    "penalty" => $penalty = !empty($realization->penalty) ? $realization->penalty : null,
-                    "surcharge" => $surcharge = !empty($realization->additional_payment) ? $realization->additional_payment : null, 
-                    "commission_wb" => $commission_wb = $retail_amount - $ppvz_for_pay,
-                    "costPrice" => $costPrice = CostPrice::where('article_wb',$order->nmId)->value('costPrice') ? CostPrice::where('article_wb',$order->nmId)->value('costPrice') : null,
-                    "advert_budget" => $advert = AdvertInfo::where('nmId',$order->nmId)->value('dailyBudget') ? AdvertInfo::where('nmId',$order->nmId)->value('dailyBudget') : 0, // доделать 
-                    "count_orders" => count($orders->where('supplierArticle',$order->supplierArticle)),
-                    "spo" => 0, // доделать 
-                    "marginality_rub" => $marginality_rub = $retail_amount - $logistics - $logisticsRefund - $penalty - $surcharge - $commission_wb - $costPrice, // проверить на отсутствие retail_amount
-                    "marginality_percent" => $retail_amount > 0 ? ($marginality_rub / $retail_amount) * 100 : 0,
-                    "days_on_the_road" => ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) > 0 ? ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) : 0,
-                    "status" => $status = $this->getStatus($logisticsRefund, $isCancel),
-                    "orders_things" => !empty($order->srid) ? 1 : 0,
-                    "buyout_rub" => $status == "Выкуплен" ? $retailPrice : 0,
-                    "buyout_things" => $status == "Выкуплен" ? 1 : 0,
-                    "refuse_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
-                    "refuse_things" => $status == "Выкуплен" ? 0 : 1,
-                    "refund_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
-                    "refund_things" => $status == "Выкуплен" ? 0 : 1,
-                    "inTransit_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
-                    "inTransit_things" => $status == "Выкуплен" ? 1 : 0,
-                    "category" => $order->category,
-                    "subject" => $order->subject,
-                    "storage" => $order->warehouseName,
-                    "SPP_rub" => $spp_rub = $retailPrice - $retail_amount,
-                    "SPP_percent" => $retailPrice > 0 ? 100 * ($spp_rub / $retailPrice) : 0,
-                    "countryName" => !empty($sale->countryName) ? $sale->countryName : null,
-                    "oblastOkrugName" => !empty($sale->oblastOkrugName) ? $sale->oblastOkrugName : null,
-                    "regionName" => !empty($sale->regionName) ? $sale->regionName : null,
-                    "brand" => !empty($sale->brand) ? $sale->brand : null,
-                    "avg_days_buyout" => 0, // доделать 
-                    "quantity" => Storage::where('supplierArticle',$order->supplierArticle)->where('warehouseName',$order->warehouseName)->sum('quantity'),
-                  ]); 
-                }   
-        });
+        //         Total::create([
+        //             "gNumber" => $order->gNumber,
+        //             "srid" => $order->srid,
+        //             "barcode" => $order->barcode,
+        //             "PriceWithDisc" => $order->priceWithDisc,
+        //             "dateOrder" => $dateOrder = !empty($realization->order_dt) ? $realization->order_dt : null,
+        //             "isCancel" => $isCancel = $order->isCancel,
+        //             "cancel_dt" => $order->cancel_dt,
+        //             "nmId" => $order->nmId,
+        //             "supplierArticle" => $order->supplierArticle,
+        //             "dateSale" => $dateSale = !empty($realization->sale_dt) ? $realization->sale_dt : null,
+        //             "retail_price_withdisc_rub" => $retailPrice = !empty($realization->retail_price_withdisc_rub) ? $realization->retail_price_withdisc_rub : 0,
+        //             "retail_amount" => $retail_amount = !empty($realization->retail_amount) ? $realization->retail_amount : 0,
+        //             "ppvz_for_pay" => $ppvz_for_pay = !empty($realization->ppvz_for_pay) ? $realization->ppvz_for_pay : 0,
+        //             "logistics" => $logistics = !empty($realization->delivery_amount) || !empty($realization->return_amount) ?  $realization->delivery_rub : (!empty($realization->product_discount_for_report) ? $realization->product_discount_for_report : null),
+        //             "logisticsRefund" => $logisticsRefund = !empty($realization->return_amount) ? $realization->delivery_rub : 0,
+        //             "penalty" => $penalty = !empty($realization->penalty) ? $realization->penalty : null,
+        //             "surcharge" => $surcharge = !empty($realization->additional_payment) ? $realization->additional_payment : null, 
+        //             "commission_wb" => $commission_wb = $retail_amount - $ppvz_for_pay,
+        //             "costPrice" => $costPrice = CostPrice::where('article_wb',$order->nmId)->value('costPrice') ? CostPrice::where('article_wb',$order->nmId)->value('costPrice') : null,
+        //             "advert_budget" => $advert = AdvertInfo::where('nmId',$order->nmId)->value('dailyBudget') ? AdvertInfo::where('nmId',$order->nmId)->value('dailyBudget') : 0, // доделать 
+        //             "count_orders" => count($orders->where('supplierArticle',$order->supplierArticle)),
+        //             "spo" => 0, // доделать 
+        //             "marginality_rub" => $marginality_rub = $retail_amount - $logistics - $logisticsRefund - $penalty - $surcharge - $commission_wb - $costPrice, // проверить на отсутствие retail_amount
+        //             "marginality_percent" => $retail_amount > 0 ? ($marginality_rub / $retail_amount) * 100 : 0,
+        //             "days_on_the_road" => ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) > 0 ? ((strtotime($dateSale) - strtotime($dateOrder)) / 86400) : 0,
+        //             "status" => $status = $this->getStatus($logisticsRefund, $isCancel),
+        //             "orders_things" => !empty($order->srid) ? 1 : 0,
+        //             "buyout_rub" => $status == "Выкуплен" ? $retailPrice : 0,
+        //             "buyout_things" => $status == "Выкуплен" ? 1 : 0,
+        //             "refuse_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+        //             "refuse_things" => $status == "Выкуплен" ? 0 : 1,
+        //             "refund_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+        //             "refund_things" => $status == "Выкуплен" ? 0 : 1,
+        //             "inTransit_rub" => $status == "Выкуплен" ? $order->priceWithDisc : 0,
+        //             "inTransit_things" => $status == "Выкуплен" ? 1 : 0,
+        //             "category" => $order->category,
+        //             "subject" => $order->subject,
+        //             "storage" => $order->warehouseName,
+        //             "SPP_rub" => $spp_rub = $retailPrice - $retail_amount,
+        //             "SPP_percent" => $retailPrice > 0 ? 100 * ($spp_rub / $retailPrice) : 0,
+        //             "countryName" => !empty($sale->countryName) ? $sale->countryName : null,
+        //             "oblastOkrugName" => !empty($sale->oblastOkrugName) ? $sale->oblastOkrugName : null,
+        //             "regionName" => !empty($sale->regionName) ? $sale->regionName : null,
+        //             "brand" => !empty($sale->brand) ? $sale->brand : null,
+        //             "avg_days_buyout" => 0, // доделать 
+        //             "quantity" => Storage::where('supplierArticle',$order->supplierArticle)->where('warehouseName',$order->warehouseName)->sum('quantity'),
+        //           ]); 
+        //         }   
+        // });
     }
 
     public function updateAdvert(){

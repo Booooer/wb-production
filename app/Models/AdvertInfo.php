@@ -30,7 +30,7 @@ class AdvertInfo extends Model
         "isActive",
     ];
 
-    public function total(){
-        return $this->belongsTo(Order::class);
+    public function order(){
+        return $this->belongsTo('App\Models\Order');
     }
 }
